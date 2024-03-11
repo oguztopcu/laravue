@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Api;
+use App\Models\Key;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -24,6 +26,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->routeModels();
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
@@ -36,5 +40,11 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
+    }
+
+    public function routeModels()
+    {
+        Route::model('apiKeyId', Api::class);
+        Route::model('keyId', Key::class);
     }
 }

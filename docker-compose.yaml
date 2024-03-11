@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - backend
+
+  node:
+    build:
+      context: ./docker/node
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - backend
+
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - backend
+    ports:
+      - "80:80"
+  
+  mysql:
+    build:
+      context: ./docker/mysql
+    volumes:
+      - ./docker/persist/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    networks:
+     - backend
+    ports:
+      - "3306:3306"
+
+networks:
+  backend:
