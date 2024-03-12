@@ -12,7 +12,7 @@ Proje adı, amacınızı ve belki kısa bir açıklama içerebilir.
 1. Depoyu klonlayın:
 
     ```bash
-    git clone https://github.com/oguztopcu/laravue.git
+    git clone git@github.com:oguztopcu/laravue.git
     ```
 
 2. Proje dizinine gidin:
