@@ -1,6 +1,4 @@
-# Proje Adı
-
-Proje adı, amacınızı ve belki kısa bir açıklama içerebilir.
+# Laravue v1
 
 ## Gereksinimler
 
