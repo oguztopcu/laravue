@@ -60,6 +60,8 @@ export default {
                 });
 
                 localStorage.setItem('token', response.data.token);
+                // note: bootstrap.js de var
+                window.axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
                 this.$router.push('/');
             } catch (err) {
                 this.error = err.response.data.message;
