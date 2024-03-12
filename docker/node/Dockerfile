@@ -1,7 +1,11 @@
-FROM node:21.7.0
+FROM node:latest
 
 WORKDIR /var/www/app
 
-RUN npm install
+RUN ls -la
 
-CMD [ "npm", "run", "dev" ]
+# ADD ../../package*.json ./
+
+# RUN npm install
+
+# CMD [ "npm", "run", "dev" ]

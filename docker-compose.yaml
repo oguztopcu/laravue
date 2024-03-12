@@ -11,9 +11,13 @@ services:
 
   node:
     build:
-      context: ./docker/node
+      context: ./
+      dockerfile: Dockerfile.node
     volumes:
       - ./:/var/www/app
+      - /var/www/app/node_modules
+    ports:
+      - "5173:5173"
     networks:
       - backend
 
