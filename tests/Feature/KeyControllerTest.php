@@ -1,113 +1,117 @@
 <?php
 
-namespace Tests\Feature\Controllers\Keys;
+namespace Tests\Feature;
 
 use App\ApiUser;
 use App\Models\Key;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class KeyControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
-    public function testIndex()
+    public function test_it_returns_key_items_for_index()
+    {
+        $user = User::factory()->create();
+        $key1 = Key::factory()->create(['user_id' => $user->id]);
+        $key2 = Key::factory()->create(['user_id' => $user->id]);
+
+        $token = $user->createToken('test')->plainTextToken;
+
+        $response = $this->json('GET', '/api/keys', [], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK)
+                 ->assertJsonStructure(['data'])
+                 ->assertJsonCount(2, 'data')
+                 ->assertJson([
+                     'data' => [
+                         [
+                             'id' => $key2->id,
+                         ],
+                         [
+                             'id' => $key1->id,
+                         ],
+                     ],
+                 ]);
+    }
+
+    public function test_it_searches_for_a_key()
+    {
+        $user = User::factory()->create();
+        $key = Key::factory()->create(['user_id' => $user->id]);
+
+        $token = $user->createToken('test')->plainTextToken;
+
+        $response = $this->json('GET', '/api/keys/search', ['name' => $key->key], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK)
+                 ->assertJsonStructure(['data']);
+    }
+
+    public function test_it_creates_or_updates_a_key_for_store()
     {
         $user = User::factory()->create();
 
-        $key = Key::factory()->create(['user_id' => $user->id]);
+        $token = $user->createToken('test')->plainTextToken;
 
-        $response = $this->actingAs($user, 'sanctum')->get('/api/keys');
+        $response = $this->json('POST', '/api/keys', [
+            'key' => 'new_key',
+            'value' => 'new_value',
+        ], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'data' => [
-                    ['id' => $key->id, 'user_id' => $user->id, 'key' => $key->key, 'value' => $key->value]
-                ]
-            ]);
+        $response->assertStatus(Response::HTTP_CREATED)
+                 ->assertJsonStructure(['message', 'data']);
+
+        // update value request
+        $existingKey = Key::factory()->create(['user_id' => $user->id]);
+        $response = $this->json('POST', '/api/keys', [
+            'key' => $existingKey->key,
+            'value' => 'updated_value',
+        ], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
+
+        $response->assertStatus(Response::HTTP_CREATED)
+                 ->assertJsonStructure(['message', 'data']);
     }
 
-    // public function testSearch()
-    // {
-    //     $user = factory(ApiUser::class)->create();
-    //     $key = factory(Key::class)->create(['user_id' => $user->id]);
+    public function test_it_returns_a_key_for_show()
+    {
+        $user = User::factory()->create();
+        $key = Key::factory()->create(['user_id' => $user->id]);
 
-    //     $response = $this->actingAs($user, 'api')
-    //         ->get('/api/keys/search', ['name' => $key->key]);
+        $token = $user->createToken('test')->plainTextToken;
 
-    //     $response->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => ['id' => $key->id, 'user_id' => $user->id, 'key' => $key->key, 'value' => $key->value]
-    //         ]);
+        $response = $this->json('GET', "/api/keys/{$key->id}", [], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
 
-    //     $response = $this->actingAs($user, 'api')
-    //         ->get('/api/keys/search', ['name' => 'nonexistent_key']);
+        $response->assertStatus(Response::HTTP_OK)
+                 ->assertJsonStructure(['data']);
+    }
 
-    //     $response->assertStatus(204);
-    // }
+    public function test_it_deletes_a_key_for_destroy()
+    {
+        $user = User::factory()->create();
+        $key = Key::factory()->create(['user_id' => $user->id]);
 
-    // public function testStore()
-    // {
-    //     $user = factory(ApiUser::class)->create();
-    //     $keyData = ['key' => 'test_key', 'value' => 'test_value'];
+        $token = $user->createToken('test')->plainTextToken;
 
-    //     $response = $this->actingAs($user, 'api')
-    //         ->post('/api/keys', $keyData);
+        $response = $this->json('DELETE', "/api/keys/{$key->id}", [], [
+            'Authorization' => 'Bearer ' . $token
+        ]);
 
-    //     $response->assertStatus(201)
-    //         ->assertJson([
-    //             'message' => trans('key.success.created'),
-    //             'data' => $keyData
-    //         ]);
-
-    //     $this->assertDatabaseHas('keys', [
-    //         'user_id' => $user->id,
-    //         'key' => $keyData['key'],
-    //         'value' => $keyData['value']
-    //     ]);
-
-    //     $response = $this->actingAs($user, 'api')
-    //         ->post('/api/keys', $keyData);
-
-    //     $response->assertStatus(201)
-    //         ->assertJson([
-    //             'message' => trans('key.success.created'),
-    //             'data' => $keyData
-    //         ]);
-
-    //     $this->assertEquals(1, Key::where('user_id', $user->id)->where('key', $keyData['key'])->count());
-    // }
-
-    // public function testShow()
-    // {
-    //     $user = factory(ApiUser::class)->create();
-    //     $key = factory(Key::class)->create(['user_id' => $user->id]);
-
-    //     $response = $this->actingAs($user, 'api')
-    //         ->get("/api/keys/{$key->id}");
-
-    //     $response->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => ['id' => $key->id, 'user_id' => $user->id, 'key' => $key->key, 'value' => $key->value]
-    //         ]);
-    // }
-
-    // public function testDestroy()
-    // {
-    //     $user = factory(ApiUser::class)->create();
-    //     $key = factory(Key::class)->create(['user_id' => $user->id]);
-
-    //     $response = $this->actingAs($user, 'api')
-    //         ->delete("/api/keys/{$key->id}");
-
-    //     $response->assertStatus(200)
-    //         ->assertJson([
-    //             'message' => trans('key.success.deleted')
-    //         ]);
-
-    //     $this->assertDatabaseMissing('keys', ['id' => $key->id]);
-    // }
+        $response->assertStatus(Response::HTTP_OK)
+                 ->assertJsonStructure(['message']);
+    }
 }

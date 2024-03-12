@@ -18,7 +18,6 @@ class KeyFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
             'key' => $this->faker->unique()->word,
             'value' => $this->faker->text,
             'created_at' => now(),
