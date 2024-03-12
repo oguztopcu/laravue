@@ -2,6 +2,8 @@ FROM php:8.3-fpm
 
 WORKDIR /var/www/app
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 RUN apt-get clean
 
 RUN apt update -y && \
@@ -15,9 +17,6 @@ RUN docker-php-ext-install zip
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+COPY . .
 
-# RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash -
-# RUN apt install -y nodejs
-# RUN node -v
-# RUN npm -v
-# RUN npm install
+RUN composer install
