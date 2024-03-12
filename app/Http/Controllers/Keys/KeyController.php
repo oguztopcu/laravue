@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Keys;
 use App\ApiUser;
 use App\Models\Key;
 use App\Http\Requests\Keys\KeyStoreRequest;
-use App\Http\Requests\Keys\KeyUpdateRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

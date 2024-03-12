@@ -53,10 +53,6 @@ Proje adı, amacınızı ve belki kısa bir açıklama içerebilir.
 
     Tarayıcıda `http://localhost` adresine giderek uygulamayı görüntüleyebilirsiniz.
 
-## Kullanım
-
-Projenin nasıl kullanılacağına dair temel bilgileri ekleyin.
-
 ## Docker Konteynerlerini Kapatma
 
 Docker konteynerlerini kapatmak için:
