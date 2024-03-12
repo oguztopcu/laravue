@@ -40,13 +40,13 @@ Proje adı, amacınızı ve belki kısa bir açıklama içerebilir.
 5. Uygulamayı başlatın:
 
     ```bash
-    docker-compose exec app php artisan key:generate
+    docker-compose exec php php artisan key:generate
     ```
 
 6. Veritabanını oluşturun ve tabloları göç edin:
 
     ```bash
-    docker-compose exec app php artisan migrate
+    docker-compose exec php php artisan migrate
     ```
 
 7. Uygulamayı kullanmaya başlayın:
